@@ -33,15 +33,15 @@ public class MainActivity extends AppCompatActivity {
 
         EditText myText = (EditText) findViewById(R.id.tagTextId);
         info = myText.getText().toString();
+
         DownloadTask task = new DownloadTask();
-        String apiKey = "255cd77ffd23e19990ec8c918b13746e";
 
         progressDialog = new ProgressDialog( MainActivity.this);
         progressDialog.setMessage("Downloading...");
         progressDialog.setCancelable(false);
         progressDialog.show();
 
-         task.execute("https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=" + apiKey + "&tags=" + info + "&format=json&nojsoncallback=1");
+         task.execute(JsonRequest.requestRawJson(info));
     }
 
 
@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
             progressDialog.cancel();
-            Intent next = new Intent(getApplicationContext(), Main2Activity.class);
+            Intent next = new Intent(getApplicationContext(), FullScreenActivity.class);
             next.putExtra("result", result);
             startActivity(next);
         }
