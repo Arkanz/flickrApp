@@ -6,10 +6,15 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 import com.daimajia.slider.library.Animations.DescriptionAnimation;
+import com.daimajia.slider.library.Indicators.PagerIndicator;
 import com.daimajia.slider.library.SliderLayout;
 import com.daimajia.slider.library.SliderTypes.BaseSliderView;
 import com.daimajia.slider.library.SliderTypes.TextSliderView;
 import com.daimajia.slider.library.Tricks.ViewPagerEx;
+import com.nineoldandroids.animation.ObjectAnimator;
+import com.nineoldandroids.animation.ValueAnimator;
+import com.nineoldandroids.view.ViewHelper;
+
 import java.util.ArrayList;
 
 public class FullScreenActivity extends AppCompatActivity implements BaseSliderView.OnSliderClickListener, ViewPagerEx.OnPageChangeListener {
@@ -38,11 +43,19 @@ public class FullScreenActivity extends AppCompatActivity implements BaseSliderV
                     .setOnSliderClickListener(this);
             sliderLayout.addSlider(textSliderView);
         }
+        sliderLayout.setIndicatorVisibility(PagerIndicator.IndicatorVisibility.Invisible);
+        sliderLayout.setPresetTransformer(SliderLayout.Transformer.Stack);
+        sliderLayout.setCustomAnimation(new DescriptionAnimation(){
 
-        sliderLayout.setPresetTransformer(SliderLayout.Transformer.Default);
-        sliderLayout.setCustomAnimation(new DescriptionAnimation());
+            public void onNextItemAppear(View view) {
+
+                view.findViewById(com.daimajia.slider.library.R.id.description_layout).setVisibility(View.INVISIBLE);
+
+            }
+        });
         sliderLayout.setDuration(3000);
         sliderLayout.addOnPageChangeListener(this);
+
 
         makeToast("Tap on picture to Like!");
     }
@@ -89,8 +102,8 @@ public class FullScreenActivity extends AppCompatActivity implements BaseSliderV
 
     //open a new activity with liked pictures
     public void likedPictures(View view){
-        Intent likedGalleryIntent =  new Intent(getApplicationContext(), LikedGalleryActivity.class);
-        likedGalleryIntent.putStringArrayListExtra("Liked", liked);
-        startActivity(likedGalleryIntent);
+        Intent grid =  new Intent(getApplicationContext(), GridViewActivity.class);
+        grid.putStringArrayListExtra("Liked", liked);
+        startActivity(grid);
     }
 }

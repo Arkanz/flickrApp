@@ -6,29 +6,36 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.daimajia.slider.library.Animations.DescriptionAnimation;
+import com.daimajia.slider.library.Indicators.PagerIndicator;
 import com.daimajia.slider.library.SliderLayout;
 import com.daimajia.slider.library.SliderTypes.BaseSliderView;
 import com.daimajia.slider.library.SliderTypes.TextSliderView;
 import com.daimajia.slider.library.Tricks.ViewPagerEx;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 
 public class LikedGalleryActivity extends AppCompatActivity   implements BaseSliderView.OnSliderClickListener, ViewPagerEx.OnPageChangeListener {
     SliderLayout sliderLayout;
+    ArrayList<String> list;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_liked_gallary);
-        ArrayList<String> list = getIntent().getStringArrayListExtra("Liked");
-
-
-        Set<String> set = new HashSet<>(list);
+        Intent intent = getIntent();
+        list = intent.getStringArrayListExtra("Liked");
+        int id = intent.getIntExtra("id", 0);
 
         sliderLayout = (SliderLayout) findViewById(R.id.slider);
+        TextSliderView textSliderView1 = new TextSliderView(LikedGalleryActivity.this);
+        textSliderView1
+                .image(list.get(id))
+                .setScaleType(BaseSliderView.ScaleType.Fit)
+                .setOnSliderClickListener(this);
+        sliderLayout.addSlider(textSliderView1);
 
-        for (String url : set) {
-
+        for (String url : list) {
+                if (url.equals(list.get(id))){ // this will skip clicked picture so it only shows once
+                    continue;
+                }
             TextSliderView textSliderView = new TextSliderView(LikedGalleryActivity.this);
             textSliderView
                     .image(url)
@@ -36,9 +43,16 @@ public class LikedGalleryActivity extends AppCompatActivity   implements BaseSli
                     .setOnSliderClickListener(this);
             sliderLayout.addSlider(textSliderView);
         }
+        sliderLayout.setIndicatorVisibility(PagerIndicator.IndicatorVisibility.Invisible);
+        sliderLayout.setCustomAnimation(new DescriptionAnimation(){
 
-        sliderLayout.setPresetTransformer(SliderLayout.Transformer.Default);
-        sliderLayout.setCustomAnimation(new DescriptionAnimation());
+            public void onNextItemAppear(View view) {
+
+                view.findViewById(com.daimajia.slider.library.R.id.description_layout).setVisibility(View.INVISIBLE);
+
+            }
+        });
+        sliderLayout.setPresetTransformer(SliderLayout.Transformer.Stack);
         sliderLayout.setDuration(3000);
         sliderLayout.addOnPageChangeListener(this);
 
@@ -46,6 +60,13 @@ public class LikedGalleryActivity extends AppCompatActivity   implements BaseSli
 
     public void restart(View view){
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        startActivity(intent);
+    }
+
+
+    public void onClickBack(View view){
+        Intent intent = new Intent(getApplicationContext(), GridViewActivity.class);
+        intent.putStringArrayListExtra("Liked",list);
         startActivity(intent);
     }
 
